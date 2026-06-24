@@ -1,121 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
+import {BrowserRouter, Routes, Route} from 'react-router-dom' 
+import { PlayerProvider, PlayerContext } from './context/PlayerContext'
+import Home from './Pages/Home'
+import PlayerView from './components/PlayerView'
+import Library from './Pages/Library'
+import Search from './Pages/Search'
+import Album from './Pages/Album'
+import LikedSongs from './Pages/LikedSongs'
+import Playlists from './Pages/Playlists'
+import PlaylistDetail from './Pages/PlaylistDetail'
+import ArtistDetail from './Pages/ArtistDetail'
+import TabBar from './components/TabBar'
+import MiniPlayer from './components/MiniPlayer'
+import { useContext } from 'react'
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppContent() {
+  const { showAsleepPrompt, isSleepMode, cancelSleepTimer, setIsPlaying } = useContext(PlayerContext);
+
+  if (isSleepMode) {
+    return (
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'black', zIndex: 9999, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', color: 'white' }}>
+        <h1 style={{ marginBottom: '24px' }}>Sleep Mode</h1>
+        <button 
+          onClick={() => { cancelSleepTimer(); }}
+          style={{ padding: '12px 24px', background: 'var(--accent)', color: 'white', borderRadius: '24px', border: 'none', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          Wake Up
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      {showAsleepPrompt && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: '16px', textAlign: 'center', maxWidth: '300px', boxShadow: '0 12px 32px rgba(0,0,0,0.8)' }}>
+            <h2 style={{ margin: '0 0 16px 0', fontSize: '24px' }}>Are you asleep?</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.5' }}>Music has been paused. The app will close shortly if there is no response.</p>
+            <button 
+              onClick={() => { cancelSleepTimer(); setIsPlaying(true); }}
+              style={{ width: '100%', padding: '14px', background: 'var(--accent)', color: 'white', borderRadius: '12px', border: 'none', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+            >
+              I'm awake!
+            </button>
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      )}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/player" element={<PlayerView />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/library/liked" element={<LikedSongs />} />
+          <Route path="/library/playlists" element={<Playlists />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/album/:name" element={<Album />} />
+          <Route path="/playlist/:id" element={<PlaylistDetail />} />
+          <Route path="/artist/:name" element={<ArtistDetail />} />
+        </Routes>
+        <MiniPlayer />
+        <TabBar />
+      </BrowserRouter>
+    </div>
+  )
+}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+function App() {
+  return (
+    <PlayerProvider>
+      <AppContent />
+    </PlayerProvider>
   )
 }
 
